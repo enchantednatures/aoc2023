@@ -58,15 +58,11 @@ fn solve2(input: &str) -> usize {
         .lines()
         .map(|l| {
             let parts: Vec<_> = l.split(":").collect();
-            let game = parts[0].split(" ").last().unwrap().parse::<i32>().unwrap();
             let rolls: Vec<_> = parts[1].split(";").collect();
-
             let game_results= rolls
                 .iter()
                 .map(|r| {
-                    dbg!(r);
                     let dice: Vec<_> = r.split(",").collect();
-                    dbg!(&dice);
                     let red = parse_roll(dice.iter(), "red");
                     let green = parse_roll(dice.iter(), "green");
                     let blue = parse_roll(dice.iter(), "blue");
@@ -106,6 +102,6 @@ mod tests {
     #[test]
     fn real_part2() {
         let input = include_str!("./part1.txt");
-        assert_eq!(2286, solve2(input) );
+        assert_eq!(49710, solve2(input) );
     }
 }
