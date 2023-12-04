@@ -19,22 +19,22 @@ where
     T: Iterator<Item = &'a &'a str>,
 {
     dice.filter(|x| x.contains(color))
-        .map(|d| d.trim().split(" ").next().unwrap().parse::<usize>().unwrap())
+        .map(|d| d.trim().split(' ').next().unwrap().parse::<usize>().unwrap())
         .sum::<usize>()
 }
 fn solve(input: &str, red_dice: usize, green_dice: usize, blue_dice: usize) -> i32 {
     input
         .lines()
         .map(|l| {
-            let parts: Vec<_> = l.split(":").collect();
-            let game = parts[0].split(" ").last().unwrap().parse::<i32>().unwrap();
-            let rolls: Vec<_> = parts[1].split(";").collect();
+            let parts: Vec<_> = l.split(':').collect();
+            let game = parts[0].split(' ').last().unwrap().parse::<i32>().unwrap();
+            let rolls: Vec<_> = parts[1].split(';').collect();
 
             let game_results= rolls
                 .iter()
                 .map(|r| {
                     dbg!(r);
-                    let dice: Vec<_> = r.split(",").collect();
+                    let dice: Vec<_> = r.split(',').collect();
                     dbg!(&dice);
                     let red = parse_roll(dice.iter(), "red");
                     let green = parse_roll(dice.iter(), "green");
@@ -57,20 +57,20 @@ fn solve2(input: &str) -> usize {
     input
         .lines()
         .map(|l| {
-            let parts: Vec<_> = l.split(":").collect();
-            let rolls: Vec<_> = parts[1].split(";").collect();
+            let parts: Vec<_> = l.split(':').collect();
+            let rolls: Vec<_> = parts[1].split(';').collect();
             let game_results= rolls
                 .iter()
                 .map(|r| {
-                    let dice: Vec<_> = r.split(",").collect();
+                    let dice: Vec<_> = r.split(',').collect();
                     let red = parse_roll(dice.iter(), "red");
                     let green = parse_roll(dice.iter(), "green");
                     let blue = parse_roll(dice.iter(), "blue");
                     Game::new(red, green, blue)
                 }).collect_vec();
-            let red_results = game_results.iter().map(|g| g.red).max_by(|x, y| x.cmp(&y)).unwrap_or(0);
-            let green_results = game_results.iter().map(|g| g.green).max_by(|x, y| x.cmp(&y)).unwrap_or(0);
-            let blue_results = game_results.iter().map(|g| g.blue).max_by(|x, y| x.cmp(&y)).unwrap_or(0);
+            let red_results = game_results.iter().map(|g| g.red).max_by(|x, y| x.cmp(y)).unwrap_or(0);
+            let green_results = game_results.iter().map(|g| g.green).max_by(|x, y| x.cmp(y)).unwrap_or(0);
+            let blue_results = game_results.iter().map(|g| g.blue).max_by(|x, y| x.cmp(y)).unwrap_or(0);
             red_results * green_results * blue_results 
         })
         .sum()

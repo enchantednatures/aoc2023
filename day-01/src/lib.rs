@@ -136,10 +136,10 @@ impl Input {
                 let first = Digits::find_first_in_line(line).to_num();
                 let last = Digits::find_last_in_line(line).to_num();
 
-                let num = 10 * first + last;
+                
 
                 // dbg!(line, first, last, num);
-                num
+                10 * first + last
             })
             .sum();
     }
