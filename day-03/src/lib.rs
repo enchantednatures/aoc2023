@@ -441,6 +441,6 @@ mod tests {
     #[test]
     fn part_2_real() {
         let input = include_str!("./part1.txt");
-        assert_eq!(49710, solve_part_2(input));
+        assert_eq!(82818007, solve_part_2(input));
     }
 }
