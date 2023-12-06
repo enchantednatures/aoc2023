@@ -18,7 +18,7 @@ struct Key {
 
 impl Key {
     fn get_value(&self, k: usize) -> usize {
-        (self.dest) + (k - self.source) 
+        (self.dest) + (k - self.source)
     }
 }
 
@@ -65,9 +65,58 @@ impl GetKeyLocation for &Vec<Key> {
     }
 }
 
+struct SeedRange {
+    start: usize,
+    count: usize,
+}
+
+impl From<(usize, usize)> for SeedRange {
+    fn from(value: (usize, usize)) -> Self {
+        Self::new(value.0, value.1)
+    }
+}
+
+impl SeedRange {
+    fn new(start: usize, count: usize) -> SeedRange {
+        SeedRange { start, count }
+    }
+}
+
+impl Iterator for SeedRange {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.count == 0 {
+            return None;
+        }
+        self.count -= 1;
+        let v = self.start;
+        self.start += 1;
+        Some(v)
+    }
+}
+
 impl<'a> Almanac<'a> {
     fn new(input: &str) -> Almanac {
         Almanac { input }
+    }
+
+    fn seeds_part_2(&self) -> Vec<SeedRange> {
+        self.input
+            .lines()
+            .nth(0)
+            .expect("Unable to get first line")
+            .split(":")
+            .last()
+            .expect("couldn't get seeds")
+            .split_whitespace()
+            .map(|f| f.trim())
+            .filter(|f| !f.is_empty())
+            .map(|x| x.parse().expect("could not parse to usize"))
+            .tuples::<(_, _)>()
+            .into_iter()
+            .map(SeedRange::from)
+            .collect_vec()
     }
 
     fn seeds(&self) -> Vec<usize> {
@@ -118,9 +167,11 @@ impl<'a> Almanac<'a> {
         li
     }
 }
+
 struct G<'a> {
     adj: Vec<(&'a str, &'a str)>,
 }
+
 impl<'a> G<'a> {
     fn paths(start: &'a str, end: &'a str) -> Vec<Vec<&'a str>> {
         todo!()
@@ -149,7 +200,7 @@ pub fn solve_part_1(input: &str) -> usize {
         let mut value = seed;
         while let Some(key) = next_key {
             let m = maps.get(&key);
-            dbg!(seed, m, key, value);
+            // dbg!(seed, m, key, value);
             value = m.unwrap_or(&vec![]).get_value(value);
             s += 1;
             d += 1;
@@ -168,7 +219,47 @@ pub fn solve_part_1(input: &str) -> usize {
 }
 
 pub fn solve_part_2(input: &str) -> usize {
-    todo!()
+    let almanac = Almanac { input };
+    let maps = almanac.build_maps();
+    let path = vec![
+        "seed",
+        "soil",
+        "fertilizer",
+        "water",
+        "light",
+        "temperature",
+        "humidity",
+        "location",
+    ];
+
+    // let seesd: Vec<_> = ;almanac.seeds_part_2().into_iter().flatten().collect()
+    let start_time = std::time::Instant::now();
+    almanac.seeds_part_2().into_iter().flatten().enumerate().fold(usize::MAX, |mut min_loc, (idx, seed)| {
+        // println!("seed: {}", idx);
+        if idx % 10000000 == 0 {
+            println!("time: {:?} - iteration: {}", start_time.elapsed(), idx);
+        }
+        let mut s = 0;
+        let mut d = 1;
+        let mut next_key = Some((path[s], path[d]));
+        let mut value = seed;
+        while let Some(key) = next_key {
+            let m = maps.get(&key);
+            // dbg!(seed, m, key, value);
+            value = m.unwrap_or(&vec![]).get_value(value);
+            s += 1;
+            d += 1;
+
+            next_key = None;
+            if d < path.len() {
+                next_key = Some((path[s], path[d]));
+            }
+            if key.1 == "location" {
+                min_loc = min_loc.min(value);
+            }
+        }
+        min_loc
+    })
 }
 
 #[cfg(test)]
@@ -184,7 +275,20 @@ mod tests {
     #[test]
     fn part_1_real() {
         let input = include_str!("./part1.txt");
-        assert_eq!(2683, solve_part_1(input));
+        assert_eq!(175622908, solve_part_1(input));
+    }
+
+    #[test]
+    fn part_2_example() {
+        let input = include_str!("./part1.test.txt");
+        assert_eq!(46, solve_part_2(input));
+    }
+
+
+    // #[test]
+    fn part_2_real() {
+        let input = include_str!("./part1.txt");
+        assert_eq!(175622908, solve_part_2(input));
     }
 
     #[test]
@@ -214,27 +318,27 @@ mod tests {
     #[test]
     fn get_test_data_value() {
         let keys = &vec![
-        Key {
-            source: 15,
-            dest: 0,
-            range: 37,
-        },
-        Key {
-            source: 52,
-            dest: 37,
-            range: 2,
-        },
-        Key {
-            source: 0,
-            dest: 39,
-            range: 15,
-        },
-    ];
+            Key {
+                source: 15,
+                dest: 0,
+                range: 37,
+            },
+            Key {
+                source: 52,
+                dest: 37,
+                range: 2,
+            },
+            Key {
+                source: 0,
+                dest: 39,
+                range: 15,
+            },
+        ];
         assert_eq!(52, keys.get_value(13));
     }
 
     #[test]
-    fn key_get_value () {
+    fn key_get_value() {
         let key = Key {
             source: 2,
             dest: 10,
