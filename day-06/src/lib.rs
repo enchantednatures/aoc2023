@@ -120,5 +120,5 @@ mod tests {
     fn part_2_real() {
         let input = include_str!("./part1.txt");
         assert_eq!(2286, solve_part_2(input));
-}
+    }
 }
